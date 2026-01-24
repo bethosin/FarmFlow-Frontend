@@ -11,7 +11,7 @@ import Listing from "./Pages/Listing/Listing";
 import About from "./Pages/About/About";
 import Contact from "./Pages/Contact/Contact";
 import AllDashboard from "./Components/DashBoard/AllDashboard";
-import AddList from "./Pages/FarmerList/Addlist";
+import AddList from "./Pages/FarmerList/AddList";
 import { AuthProvider } from "./AuthContext";
 import PlaceOrder from "./Pages/BuyerList/PlaceOrder";
 import { ToastContainer } from "react-toastify";
