@@ -12,12 +12,14 @@ import About from "./Pages/About/About";
 import Contact from "./Pages/Contact/Contact";
 import AllDashboard from "./Components/DashBoard/AllDashboard";
 
+
 import { AuthProvider } from "./AuthContext";
 import PlaceOrder from "./Pages/BuyerList/PlaceOrder";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import AddList from "./Pages/FarmerList/Addlist";
+import FarmAddList from "./Pages/FarmerList/FarmAddList";
+
 
 
 const App = () => {
@@ -46,7 +48,7 @@ const App = () => {
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/dashboard/*" element={<AllDashboard />} />
-          <Route path="/add-list" element={<AddList />} />
+          <Route path="/add-list" element={<FarmAddList />} />
           <Route path="/buyer/place-order/:id" element={<PlaceOrder />} />
         </Routes>
       </div>

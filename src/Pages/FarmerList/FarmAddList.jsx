@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const AddList = () => {
+const FarmAddList = () => {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -124,4 +124,4 @@ const AddList = () => {
   );
 };
 
-export default AddList;
+export default FarmAddList;
