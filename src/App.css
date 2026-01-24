@@ -1,0 +1,19 @@
+/* Toastify Custom Theme */
+.toast-success {
+  background-color: var(--primary-green) !important;
+  color: white !important;
+  font-weight: 500;
+}
+
+.toast-error {
+  background-color: #dc3545 !important; /* Red for errors */
+  color: white !important;
+  font-weight: 500;
+}
+
+/* Optional: Toast container adjustments */
+.Toastify__toast {
+  border-radius: 8px !important;
+  font-family: "Segoe UI", sans-serif;
+  padding: 12px 16px;
+}
