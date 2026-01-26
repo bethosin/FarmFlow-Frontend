@@ -46,7 +46,7 @@ const BuyerOrder = () => {
                 <tr key={order._id}>
                   <td>{order.listing?.title || "—"}</td>
                   <td>{order.quantity}</td>
-                  <td>{order.totalAmount.toLocaleString()}</td>
+                  <td>₦{Number(order.totalAmount || 0).toLocaleString()}</td>
                   <td>
                     <span className="badge bg-secondary">{order.status}</span>
                   </td>
