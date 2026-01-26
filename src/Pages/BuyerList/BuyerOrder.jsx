@@ -30,9 +30,10 @@ const BuyerOrder = () => {
       ) : orders.length === 0 ? (
         <p className="text-muted">You have no orders yet.</p>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-striped">
-            <thead>
+        // ✅ Added custom responsive class for extra small devices
+        <div className="table-responsive-sm">
+          <table className="table table-striped table-hover align-middle text-nowrap">
+            <thead className="table-light">
               <tr>
                 <th>Item</th>
                 <th>Qty</th>
