@@ -16,6 +16,8 @@ const FarmAddList = () => {
 
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [imageBase64, setImageBase64] = useState("");
+  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
@@ -23,14 +25,55 @@ const FarmAddList = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // ✅ Convert image to base64
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      setImageBase64(reader.result);
+    };
+  };
+
+  // ✅ Upload base64 image to backend
+  const uploadImage = async () => {
+    if (!imageBase64) return null;
+    try {
+      const res = await axios.post(
+        "https://farmflow-backend-aizi.onrender.com/upload",
+        {
+          file: imageBase64,
+        },
+      );
+      return res.data.imageUrl;
+    } catch (err) {
+      console.error("Upload error", err);
+      setError("Image upload failed");
+      return null;
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
 
+    let imageUrl = "";
+
+    // ✅ Upload image if present
+    if (imageBase64) {
+      imageUrl = await uploadImage();
+      if (!imageUrl) {
+        setSubmitting(false);
+        return;
+      }
+      setUploadedImageUrl(imageUrl);
+    }
+
     const payload = {
       ...form,
-      images: [], // ✅ Send empty array to satisfy backend
+      images: imageUrl ? [imageUrl] : [], // Send uploaded image URL
     };
 
     axios
@@ -108,6 +151,29 @@ const FarmAddList = () => {
             required
           />
         </div>
+
+        {/* ✅ File Upload */}
+        <div className="col-md-6">
+          <label className="form-label fw-semibold">Upload Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            className="form-control"
+            onChange={handleFileChange}
+          />
+        </div>
+
+        {/* ✅ Image Preview */}
+        {imageBase64 && (
+          <div className="col-md-6">
+            <label className="form-label d-block fw-semibold">Preview</label>
+            <img
+              src={imageBase64}
+              alt="Preview"
+              style={{ maxWidth: "200px", borderRadius: "8px" }}
+            />
+          </div>
+        )}
 
         {/* Submit */}
         <div className="col-12">
