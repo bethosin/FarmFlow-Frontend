@@ -1,35 +1,25 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
-const previewListings = [
-  {
-    id: 1,
-    title: "Fresh Yellow Maize",
-    category: "Maize",
-    price: "₦45,000 / bag",
-    description: "Bulk supply available directly from local farmers.",
-    image: "https://images.unsplash.com/photo-1602524202855-6bd8c36b9c1a",
-  },
-  {
-    id: 2,
-    title: "Organic Cassava Tubers",
-    category: "Cassava",
-    price: "₦38,000 / ton",
-    description: "Harvested weekly and ready for processing.",
-    image: "https://images.unsplash.com/photo-1582515073490-dc798b83add3",
-  },
-  {
-    id: 3,
-    title: "Grade A Tomatoes",
-    category: "Tomatoes",
-    price: "₦22,000 / basket",
-    description: "Fresh produce suitable for markets and restaurants.",
-    image: "https://images.unsplash.com/photo-1567306226416-28f0efdc88ce",
-  },
-];
+const MarketPlace = () => {
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-const MarketPlace= () => {
- 
+  useEffect(() => {
+    axios
+      .get("https://farmflow-backend-aizi.onrender.com/api/listings")
+      .then((res) => {
+        // Only take first 3 listings for homepage preview
+        setListings(res.data.listings.slice(0, 3));
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch listings:", err);
+        setLoading(false);
+      });
+  }, []);
+
   return (
     <section className="section-padding">
       <div className="container">
@@ -47,48 +37,56 @@ const MarketPlace= () => {
           </Link>
         </div>
 
-        {/* Preview Cards */}
+        {/* Listings Preview */}
         <div className="row g-4">
-          {previewListings.map((listing, index) => (
-            <div
-              className="col-md-6 col-lg-4"
-              key={listing.id}
-              data-aos="fade-up"
-              data-aos-delay={index * 100}
-            >
-              <div className="card h-100 border-0 shadow-sm rounded-4">
-                <img
-                  src={listing.image}
-                  className="card-img-top"
-                  alt={listing.title}
-                  style={{ height: "220px", objectFit: "cover" }}
-                />
+          {loading ? (
+            <p className="text-muted">Loading listings...</p>
+          ) : listings.length === 0 ? (
+            <p className="text-muted">No listings available right now.</p>
+          ) : (
+            listings.map((listing, index) => (
+              <div
+                className="col-md-6 col-lg-4"
+                key={listing._id}
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
+              >
+                <div className="card h-100 border-0 shadow-sm rounded-4">
+                  <img
+                    src={listing.images?.[0] || "/placeholder.jpg"}
+                    className="card-img-top"
+                    alt={listing.title}
+                    style={{ height: "220px", objectFit: "cover" }}
+                  />
 
-                <div className="card-body d-flex flex-column">
-                  <span className="badge bg-green-subtle text-green mb-2 align-self-start">
-                    {listing.category}
-                  </span>
+                  <div className="card-body d-flex flex-column">
+                    <span className="badge bg-green-subtle text-green mb-2 align-self-start">
+                      {listing.category}
+                    </span>
 
-                  <h5 className="card-title">{listing.title}</h5>
+                    <h5 className="card-title">{listing.title}</h5>
 
-                  <p className="card-text text-muted flex-grow-1">
-                    {listing.description}
-                  </p>
+                    <p className="card-text text-muted flex-grow-1">
+                      {listing.description?.slice(0, 80)}...
+                    </p>
 
-                  <div className="d-flex justify-content-between align-items-center mt-2">
-                    <strong className="text-green">{listing.price}</strong>
+                    <div className="d-flex justify-content-between align-items-center mt-2">
+                      <strong className="text-green">
+                        ₦{listing.price.toLocaleString()} / {listing.unit}
+                      </strong>
 
-                    <Link
-                      to="/listings"
-                      className="btn btn-sm btn-primary"
-                    >
-                      View Details
-                    </Link>
+                      <Link
+                        to={`/listings/${listing._id}`}
+                        className="btn btn-sm btn-primary"
+                      >
+                        View Details
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </section>

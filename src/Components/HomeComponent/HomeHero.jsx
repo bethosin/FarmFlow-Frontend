@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { Link } from "react-router-dom";
 
 const HomeHero = () => {
@@ -12,17 +12,18 @@ const HomeHero = () => {
         backgroundPosition: "center",
       }}
     >
-      <div className="container section-padding">
-        <div className="row align-items-center gy-4">
+      <div className="container py-5 px-3 px-md-4 px-lg-5">
+        <div className="row align-items-center gy-5">
+          {/* LEFT TEXT SIDE */}
           <div className="col-lg-6">
             <span className="badge bg-light text-green mb-3">
               Built for Nigerian Agriculture
             </span>
 
             <h1 className="fw-bold display-5 mb-3">
-              Empowering Farmers.
+              Empowering Farmers Connecting
               <br />
-              Connecting Markets.
+              Markets
             </h1>
 
             <p className="lead mb-4">
@@ -44,11 +45,13 @@ const HomeHero = () => {
             </p>
           </div>
 
+          {/* RIGHT IMAGE SIDE */}
           <div className="col-lg-6 text-center">
             <img
               src="https://i.pinimg.com/736x/ec/be/07/ecbe07eabb98f298a78001ef4892a3a0.jpg"
               alt="Farmer in field"
-              className="img-fluid rounded-4 shadow"
+              className="img-fluid rounded-4 shadow w-100"
+              style={{ maxWidth: "500px" }}
             />
           </div>
         </div>
@@ -56,5 +59,5 @@ const HomeHero = () => {
     </section>
   );
 };
-export default HomeHero;
 
+export default HomeHero;
