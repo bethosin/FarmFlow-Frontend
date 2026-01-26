@@ -1,7 +1,6 @@
-// src/pages/Market.jsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import ListingCard from "../ListingCard/ListingCard"; // ✅ Adjust this path if needed
+import ListingCard from "../ListingCard/ListingCard";
 
 const Market = () => {
   const [listings, setListings] = useState([]);
@@ -15,7 +14,7 @@ const Market = () => {
     setLoading(true);
 
     axios
-      .get("http://localhost:5501/api/listings") // ✅ Ensure this route is public or send token
+      .get("https://farmflow-backend-aizi.onrender.com/api/listings") 
       .then((res) => {
         setListings(res.data.listings);
         setLoading(false);
@@ -26,7 +25,18 @@ const Market = () => {
       });
   }, []);
 
-  // Apply filters
+  // Dynamically extract unique categories and locations
+  const uniqueCategories = [
+    "All",
+    ...new Set(listings.map((item) => item.category).filter(Boolean)),
+  ];
+
+  const uniqueLocations = [
+    "All",
+    ...new Set(listings.map((item) => item.location).filter(Boolean)),
+  ];
+
+  // Filter listings
   const filteredListings = listings.filter((item) => {
     const matchesSearch =
       item.title?.toLowerCase().includes(search.toLowerCase()) ||
@@ -35,7 +45,6 @@ const Market = () => {
         .includes(search.toLowerCase());
 
     const matchesCategory = category === "All" || item.category === category;
-
     const matchesLocation =
       location === "All" ||
       item.location?.toLowerCase().includes(location.toLowerCase());
@@ -75,12 +84,11 @@ const Market = () => {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
-                <option>All</option>
-                <option>Maize</option>
-                <option>Cassava</option>
-                <option>Tomatoes</option>
-                <option>Yam</option>
-                <option>Livestock</option>
+                {uniqueCategories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -91,11 +99,11 @@ const Market = () => {
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
               >
-                <option>All</option>
-                <option>Oyo</option>
-                <option>Benue</option>
-                <option>Kaduna</option>
-                <option>Lagos</option>
+                {uniqueLocations.map((loc) => (
+                  <option key={loc} value={loc}>
+                    {loc}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -114,7 +122,7 @@ const Market = () => {
           </div>
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings */}
         {loading ? (
           <p className="text-muted">Loading listings...</p>
         ) : filteredListings.length === 0 ? (
@@ -122,7 +130,7 @@ const Market = () => {
         ) : (
           <div className="row g-4">
             {filteredListings.map((listing) => (
-              <div className="col-sm-6 col-lg-4" key={listing._id}>
+              <div className="col-12 col-sm-6 col-lg-4" key={listing._id}>
                 <ListingCard
                   id={listing._id}
                   image={listing.images?.[0]}
