@@ -41,7 +41,7 @@ const FarmAddList = () => {
     if (!imageBase64) return null;
     try {
       const res = await axios.post(
-        "https://farmflow-backend-aizi.onrender.com/upload",
+        "https://farmflow-backend-aizi.onrender.com/api/upload",
         {
           file: imageBase64,
         },
