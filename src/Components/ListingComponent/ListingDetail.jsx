@@ -18,7 +18,7 @@ const ListingDetail = () => {
     if (!id) return;
 
     axios
-      .get(`http://localhost:5501/api/listings/${id}`, {
+      .get(`https://farmflow-backend-aizi.onrender.com/api/listings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
