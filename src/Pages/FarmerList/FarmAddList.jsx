@@ -39,6 +39,8 @@ const FarmAddList = () => {
   // ✅ Upload base64 image to backend
   const uploadImage = async () => {
     if (!imageBase64) return null;
+
+
     try {
       const res = await axios.post(
         "https://farmflow-backend-aizi.onrender.com/api/upload",
@@ -157,7 +159,7 @@ const FarmAddList = () => {
           <label className="form-label fw-semibold">Upload Image</label>
           <input
             type="file"
-            accept="image/*"
+            accept="image/png, image/jpeg"
             className="form-control"
             onChange={handleFileChange}
           />
