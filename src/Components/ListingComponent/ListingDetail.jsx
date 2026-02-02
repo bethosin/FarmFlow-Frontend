@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "axios";
 
 const ListingDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate(); // ✅ Added
   const [listing, setListing] = useState(null);
   const [activeImage, setActiveImage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -54,13 +56,34 @@ const ListingDetail = () => {
         },
       )
       .then(() => {
-        alert("Order placed successfully!");
+        toast.success("Order placed successfully!");
         setShowOrderForm(false);
         setQuantity(1);
       })
       .catch((err) => {
         console.error("Order error:", err);
         setOrderError(err.response?.data?.message || "Order failed");
+      });
+  };
+
+  // ✅ Delete handler
+  const handleDelete = () => {
+    const confirm = window.confirm(
+      "Are you sure you want to delete this listing?",
+    );
+    if (!confirm) return;
+
+    axios
+      .delete(`https://farmflow-backend-aizi.onrender.com/api/listings/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => {
+        toast.success("Listing deleted successfully");
+        navigate("/dashboard/my-listings");
+      })
+      .catch((err) => {
+        console.error("Delete error:", err);
+        toast.error("Failed to delete listing");
       });
   };
 
@@ -161,6 +184,24 @@ const ListingDetail = () => {
                 >
                   {showOrderForm ? "Cancel Order" : "Place Order"}
                 </button>
+              )}
+
+              {/* ✅ Only show if user is the seller */}
+              {user?._id === listing.seller._id && (
+                <>
+                  <button
+                    className="btn btn-warning btn-lg"
+                    onClick={() => navigate(`/listings/${listing._id}/edit`)}
+                  >
+                    Edit Listing
+                  </button>
+                  <button
+                    className="btn btn-danger btn-lg"
+                    onClick={handleDelete}
+                  >
+                    Delete Listing
+                  </button>
+                </>
               )}
             </div>
 

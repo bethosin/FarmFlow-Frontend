@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const FarmAddList = () => {
+const EditListing = () => {
+  const { id } = useParams();
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -13,19 +14,40 @@ const FarmAddList = () => {
     location: "",
     delivery: "",
   });
-
+  const [imageBase64, setImageBase64] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [imageBase64, setImageBase64] = useState("");
-  const [uploadedImageUrl, setUploadedImageUrl] = useState("");
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    axios
+      .get(`https://farmflow-backend-aizi.onrender.com/api/listings/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const data = res.data.listing;
+        setForm({
+          title: data.title,
+          description: data.description,
+          price: data.price,
+          unit: data.unit,
+          quantity: data.quantity,
+          category: data.category,
+          location: data.location,
+          delivery: data.delivery,
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to load listing:", err);
+        setError("Failed to load listing");
+      });
+  }, [id]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // ✅ Convert image to base64
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -36,18 +58,12 @@ const FarmAddList = () => {
     };
   };
 
-  // ✅ Upload base64 image to backend
   const uploadImage = async () => {
     if (!imageBase64) return null;
-
-
     try {
-      const res = await axios.post(
-        "https://farmflow-backend-aizi.onrender.com/api/upload",
-        {
-          file: imageBase64,
-        },
-      );
+      const res = await axios.post("https://farmflow-backend-aizi.onrender.com/api/upload", {
+        file: imageBase64,
+      });
       return res.data.imageUrl;
     } catch (err) {
       console.error("Upload error", err);
@@ -61,25 +77,22 @@ const FarmAddList = () => {
     setError("");
     setSubmitting(true);
 
-    let imageUrl = "";
-
-    // ✅ Upload image if present
+    let imageUrl = null;
     if (imageBase64) {
       imageUrl = await uploadImage();
       if (!imageUrl) {
         setSubmitting(false);
         return;
       }
-      setUploadedImageUrl(imageUrl);
     }
 
-    const payload = {
+    const updatedPayload = {
       ...form,
-      images: imageUrl ? [imageUrl] : [], // Send uploaded image URL
+      ...(imageUrl && { images: [imageUrl] }),
     };
 
     axios
-      .post("https://farmflow-backend-aizi.onrender.com/api/listings", payload, {
+      .put(`https://farmflow-backend-aizi.onrender.com/api/listings/${id}`, updatedPayload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -88,19 +101,16 @@ const FarmAddList = () => {
       .then(() => navigate("/dashboard/my-listings"))
       .catch((err) => {
         console.error(err);
-        setError("Failed to create listing.");
+        setError("Failed to update listing.");
       })
       .finally(() => setSubmitting(false));
   };
 
   return (
     <section className="container py-5">
-      <h2 className="fw-bold mb-4 text-green">Add New Listing</h2>
-
+      <h2 className="fw-bold mb-4 text-green">Edit Listing</h2>
       {error && <div className="alert alert-danger">{error}</div>}
-
       <form onSubmit={handleSubmit} className="row g-4">
-        {/* Fields */}
         {[
           { name: "title", label: "Title", type: "text" },
           { name: "price", label: "Price (₦)", type: "number" },
@@ -115,18 +125,19 @@ const FarmAddList = () => {
               name={name}
               type={type}
               className="form-control"
+              value={form[name]}
               onChange={handleChange}
               required
             />
           </div>
         ))}
 
-        {/* Category */}
         <div className="col-md-6">
           <label className="form-label fw-semibold">Category</label>
           <select
             name="category"
             className="form-select"
+            value={form.category}
             onChange={handleChange}
             required
           >
@@ -138,21 +149,20 @@ const FarmAddList = () => {
           </select>
         </div>
 
-        {/* Description */}
         <div className="col-12">
           <label className="form-label fw-semibold">Description</label>
           <textarea
             name="description"
             className="form-control"
             rows="4"
+            value={form.description}
             onChange={handleChange}
             required
           />
         </div>
 
-        {/* ✅ File Upload */}
         <div className="col-md-6">
-          <label className="form-label fw-semibold">Upload Image</label>
+          <label className="form-label fw-semibold">Upload New Image</label>
           <input
             type="file"
             accept="image/png, image/jpeg"
@@ -161,7 +171,6 @@ const FarmAddList = () => {
           />
         </div>
 
-        {/* ✅ Image Preview */}
         {imageBase64 && (
           <div className="col-md-6">
             <label className="form-label d-block fw-semibold">Preview</label>
@@ -173,14 +182,13 @@ const FarmAddList = () => {
           </div>
         )}
 
-        {/* Submit */}
         <div className="col-12">
           <button
             type="submit"
             className="btn btn-accent btn-lg w-100"
             disabled={submitting}
           >
-            {submitting ? "Submitting..." : "Submit Listing"}
+            {submitting ? "Updating..." : "Update Listing"}
           </button>
         </div>
       </form>
@@ -188,4 +196,4 @@ const FarmAddList = () => {
   );
 };
 
-export default FarmAddList;
+export default EditListing;
