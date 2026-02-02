@@ -20,7 +20,10 @@ const EditListing = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
+  // ✅ Fetch listing by ID
   useEffect(() => {
+    if (!id) return;
+
     axios
       .get(`https://farmflow-backend-aizi.onrender.com/api/listings/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -44,6 +47,7 @@ const EditListing = () => {
       });
   }, [id]);
 
+  // ✅ Handle input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
@@ -58,59 +62,72 @@ const EditListing = () => {
     };
   };
 
-  const uploadImage = async () => {
-    if (!imageBase64) return null;
-    try {
-      const res = await axios.post("https://farmflow-backend-aizi.onrender.com/api/upload", {
+  // ✅ Upload image to backend (base64)
+  const uploadImage = () => {
+    return axios
+      .post("https://farmflow-backend-aizi.onrender.com/api/upload", {
         file: imageBase64,
+      })
+      .then((res) => res.data.imageUrl)
+      .catch((err) => {
+        console.error("Upload error", err);
+        setError("Image upload failed");
+        return null;
       });
-      return res.data.imageUrl;
-    } catch (err) {
-      console.error("Upload error", err);
-      setError("Image upload failed");
-      return null;
-    }
   };
 
-  const handleSubmit = async (e) => {
+  // ✅ Submit updated data
+  const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
     setSubmitting(true);
 
-    let imageUrl = null;
-    if (imageBase64) {
-      imageUrl = await uploadImage();
-      if (!imageUrl) {
-        setSubmitting(false);
-        return;
+    const updateData = () => {
+      const payload = { ...form };
+      if (imageBase64) {
+        uploadImage().then((imageUrl) => {
+          if (!imageUrl) {
+            setSubmitting(false);
+            return;
+          }
+          payload.images = [imageUrl];
+          sendUpdate(payload);
+        });
+      } else {
+        sendUpdate(payload);
       }
-    }
-
-    const updatedPayload = {
-      ...form,
-      ...(imageUrl && { images: [imageUrl] }),
     };
 
-    axios
-      .put(`https://farmflow-backend-aizi.onrender.com/api/listings/${id}`, updatedPayload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
-      .then(() => navigate("/dashboard/my-listings"))
-      .catch((err) => {
-        console.error(err);
-        setError("Failed to update listing.");
-      })
-      .finally(() => setSubmitting(false));
+    const sendUpdate = (payload) => {
+      axios
+        .put(
+          `https://farmflow-backend-aizi.onrender.com/api/listings/${id}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          },
+        )
+        .then(() => navigate("/dashboard/my-listings"))
+        .catch((err) => {
+          console.error(err);
+          setError("Failed to update listing.");
+        })
+        .finally(() => setSubmitting(false));
+    };
+
+    updateData();
   };
 
   return (
     <section className="container py-5">
       <h2 className="fw-bold mb-4 text-green">Edit Listing</h2>
       {error && <div className="alert alert-danger">{error}</div>}
+
       <form onSubmit={handleSubmit} className="row g-4">
+        {/* Standard Input Fields */}
         {[
           { name: "title", label: "Title", type: "text" },
           { name: "price", label: "Price (₦)", type: "number" },
@@ -132,6 +149,7 @@ const EditListing = () => {
           </div>
         ))}
 
+        {/* Category */}
         <div className="col-md-6">
           <label className="form-label fw-semibold">Category</label>
           <select
@@ -149,6 +167,7 @@ const EditListing = () => {
           </select>
         </div>
 
+        {/* Description */}
         <div className="col-12">
           <label className="form-label fw-semibold">Description</label>
           <textarea
@@ -161,6 +180,7 @@ const EditListing = () => {
           />
         </div>
 
+        {/* Upload Image */}
         <div className="col-md-6">
           <label className="form-label fw-semibold">Upload New Image</label>
           <input
@@ -171,9 +191,10 @@ const EditListing = () => {
           />
         </div>
 
+        {/* Preview */}
         {imageBase64 && (
           <div className="col-md-6">
-            <label className="form-label d-block fw-semibold">Preview</label>
+            <label className="form-label fw-semibold d-block">Preview</label>
             <img
               src={imageBase64}
               alt="Preview"
@@ -182,6 +203,7 @@ const EditListing = () => {
           </div>
         )}
 
+        {/* Submit */}
         <div className="col-12">
           <button
             type="submit"
