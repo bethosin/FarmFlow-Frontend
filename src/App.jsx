@@ -19,7 +19,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import FarmAddList from "./Pages/FarmerList/FarmAddList";
 import PrivateRoute from "./utils/privateRoute";
-import EditListing from "./Pages/FarmerList/EditListing";
+
 
 const AppContent = () => {
   const location = useLocation();
@@ -62,14 +62,7 @@ const AppContent = () => {
               </PrivateRoute>
             }
           />
-          <Route
-            path="/listings/:id/edit"
-            element={
-              <PrivateRoute>
-                <EditListing />
-              </PrivateRoute>
-            }
-          />
+          
           <Route path="/add-list" element={<FarmAddList />} />
           <Route path="/buyer/place-order/:id" element={<PlaceOrder />} />
         </Routes>

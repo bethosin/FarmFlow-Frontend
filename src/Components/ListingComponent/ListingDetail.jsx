@@ -189,12 +189,7 @@ const ListingDetail = () => {
               {/* ✅ Only show if user is the seller */}
               {user?._id === listing.seller._id && (
                 <>
-                  <button
-                    className="btn btn-warning btn-lg"
-                    onClick={() => navigate(`/listings/${listing._id}/edit`)}
-                  >
-                    Edit Listing
-                  </button>
+                
                   <button
                     className="btn btn-danger btn-lg"
                     onClick={handleDelete}

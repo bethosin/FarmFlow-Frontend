@@ -16,9 +16,12 @@ const FarmerList = () => {
 
   const fetchListings = () => {
     axios
-      .get("https://farmflow-backend-aizi.onrender.com/api/farmer/my-listings", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get(
+        "https://farmflow-backend-aizi.onrender.com/api/farmer/my-listings",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
       .then((res) => {
         setListings(res.data.listings || []);
         setLoading(false);
@@ -94,14 +97,8 @@ const FarmerList = () => {
                 </span>
               </div>
 
-              {/* ✅ Buttons */}
+            
               <div className="card-footer d-flex flex-wrap justify-content-between gap-2">
-                <Link
-                  to={`/listings/${listing._id}/edit`}
-                  className="btn btn-sm btn-outline-primary w-100"
-                >
-                  Edit
-                </Link>
                 <button
                   onClick={() => handleDelete(listing._id)}
                   className="btn btn-sm btn-outline-danger w-100"
