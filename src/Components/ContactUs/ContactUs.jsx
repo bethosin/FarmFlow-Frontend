@@ -1,6 +1,31 @@
 import React from "react";
+import { Formik, Form, Field } from "formik";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const ContactUs = () => {
+  const initialValues = {
+    name: "",
+    email: "",
+    message: "",
+  };
+
+  const handleSubmit = (values, { setSubmitting, resetForm }) => {
+    axios
+      .post("https://farmflow-backend-aizi.onrender.com/api/contact", values)
+      .then(() => {
+        toast.success("Message sent successfully!");
+        resetForm();
+      })
+      .catch((err) => {
+        console.error("Message send error:", err);
+        toast.error("Failed to send message. Please try again.");
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
+  };
+
   return (
     <div>
       {/* ===== HERO SECTION ===== */}
@@ -39,7 +64,7 @@ const ContactUs = () => {
                 className="img-fluid rounded-4 shadow-sm mb-4"
               />
 
-              <h5 className="fw-bold mb-3">We will Love to Hear From You</h5>
+              <h5 className="fw-bold mb-3">We would love to hear from you</h5>
               <p className="text-muted">
                 Reach out to us for general inquiries, partnership
                 opportunities, or technical support. We aim to respond to all
@@ -58,48 +83,60 @@ const ContactUs = () => {
               <div className="card p-4 p-md-5 border-0 shadow-sm rounded-4">
                 <h4 className="fw-bold mb-4">Send Us a Message</h4>
 
-                <form>
-                  <div className="mb-3">
-                    <label className="form-label">Full Name</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
+                <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+                  {({ isSubmitting }) => (
+                    <Form>
+                      <div className="mb-3">
+                        <label className="form-label">Full Name</label>
+                        <Field
+                          name="name"
+                          type="text"
+                          className="form-control"
+                          placeholder="Your full name"
+                          required
+                        />
+                      </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Email Address</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      placeholder="your@email.com"
-                      required
-                    />
-                  </div>
+                      <div className="mb-3">
+                        <label className="form-label">Email Address</label>
+                        <Field
+                          name="email"
+                          type="email"
+                          className="form-control"
+                          placeholder="your@email.com"
+                          required
+                        />
+                      </div>
 
-                  <div className="mb-3">
-                    <label className="form-label">Message</label>
-                    <textarea
-                      className="form-control"
-                      rows="4"
-                      placeholder="How can we help you?"
-                      required
-                    ></textarea>
-                  </div>
+                      <div className="mb-3">
+                        <label className="form-label">Message</label>
+                        <Field
+                          as="textarea"
+                          name="message"
+                          rows="4"
+                          className="form-control"
+                          placeholder="How can we help you?"
+                          required
+                        />
+                      </div>
 
-                  <div className="d-grid">
-                    <button type="submit" className="btn btn-primary btn-lg">
-                      Send Message
-                    </button>
-                  </div>
+                      <div className="d-grid">
+                        <button
+                          type="submit"
+                          className="btn btn-primary btn-lg"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? "Sending..." : "Send Message"}
+                        </button>
+                      </div>
 
-                  <p className="text-muted small mt-3 mb-0">
-                    By submitting this form, you agree to be contacted by the
-                    Farm Flow team.
-                  </p>
-                </form>
+                      <p className="text-muted small mt-3 mb-0">
+                        By submitting this form, you agree to be contacted by
+                        the Farm Flow team.
+                      </p>
+                    </Form>
+                  )}
+                </Formik>
               </div>
             </div>
           </div>
