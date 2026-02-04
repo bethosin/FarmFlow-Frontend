@@ -72,16 +72,17 @@ const GetStarted = () => {
           userData,
         )
         .then((res) => {
-          if (res.data.message === "Account created successfully") {
-            toast.success("Account created! Redirecting...", {
-              className: "toast-success",
-            });
-            setTimeout(() => navigate("/login"), 2000);
-          } else {
-            toast.error(res.data.message || "Registration failed", {
-              className: "toast-error",
-            });
-          }
+         if (res.data.status) {
+           toast.success("Account created! Redirecting...", {
+             className: "toast-success",
+           });
+           setTimeout(() => navigate("/login"), 2000);
+         } else {
+           toast.error(res.data.message || "Registration failed", {
+             className: "toast-error",
+           });
+         }
+
         })
         .catch(() => {
           toast.error("Something went wrong. Please try again.", {
